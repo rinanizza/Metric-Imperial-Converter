@@ -1,59 +1,57 @@
-'use strict';
+"use strict";
 
-const express     = require('express');
-const bodyParser  = require('body-parser');
-const expect      = require('chai').expect;
-const cors        = require('cors');
-require('dotenv').config();
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+require("dotenv").config();
 
-const apiRoutes         = require('./routes/api.js');
-const fccTestingRoutes  = require('./routes/fcctesting.js');
-const runner            = require('./test-runner');
+const apiRoutes = require("./routes/api.js");
+const fccTestingRoutes = require("./routes/fcctesting.js");
+const runner = require("./test-runner");
 
-let app = express();
+const app = express();
 
-app.use('/public', express.static(process.cwd() + '/public'));
+// Serve static files from the "public" directory
+app.use("/public", express.static(process.cwd() + "/public"));
 
-app.use(cors({origin: '*'})); //For FCC testing purposes only
+// Enable CORS for all origins (for FCC testing purposes)
+app.use(cors({ origin: "*" }));
 
+// Middleware for parsing request bodies
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//Index page (static HTML)
-app.route('/')
-  .get(function (req, res) {
-    res.sendFile(process.cwd() + '/views/index.html');
-  });
-
-//For FCC testing purposes
-fccTestingRoutes(app);
-
-//Routing for API 
-apiRoutes(app);  
-    
-//404 Not Found Middleware
-app.use(function(req, res, next) {
-  res.status(404)
-    .type('text')
-    .send('Not Found');
+// Serve the index.html file for the root route
+app.route("/").get((req, res) => {
+  res.sendFile(process.cwd() + "/views/index.html");
 });
 
-const port = process.env.PORT || 3000;
+// Set up FCC testing routes
+fccTestingRoutes(app);
 
-//Start our server and tests!
-app.listen(port, function () {
-  console.log("Listening on port " + port);
-  if(process.env.NODE_ENV==='test') {
-    console.log('Running Tests...');
-    setTimeout(function () {
+// Set up API routes
+apiRoutes(app);
+
+// 404 Not Found Middleware
+app.use((req, res, next) => {
+  res.status(404).type("text").send("Not Found");
+});
+
+// Start the server and run tests if in test mode
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
+  if (process.env.NODE_ENV === "test") {
+    console.log("Running Tests...");
+    setTimeout(() => {
       try {
         runner.run();
-      } catch(e) {
-          console.log('Tests are not valid:');
-          console.error(e);
+      } catch (e) {
+        console.log("Tests are not valid:");
+        console.log(e);
       }
     }, 1500);
   }
 });
 
-module.exports = app; //for testing
+module.exports = app; // Export for testing
