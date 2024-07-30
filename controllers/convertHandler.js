@@ -2,7 +2,7 @@
 function numberStringSplitter(input) {
   // Split number and unit from input
   let number = input.match(/[.\d\/]+/g) || ["1"];
-  let string = input.match(/[a-zA-Z]+/g);
+  let string = input.match(/[a-zA-Z]+/g)|| [""];
   
   // Check if the string is found, otherwise return default values
   if (string && string.length > 0) {
