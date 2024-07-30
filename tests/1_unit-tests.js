@@ -1,6 +1,10 @@
 const chai = require('chai');
 const assert = chai.assert;
 const ConvertHandler = require('../controllers/convertHandler.js');
+const server = require('../server'); // Adjust this path to your server file if necessary
+const chaiHttp = require('chai-http');
+
+chai.use(chaiHttp);
 
 const convertHandler = new ConvertHandler();
 
@@ -137,4 +141,12 @@ suite('Unit Tests', function () {
       done();
     });
   });
+
+  // Add the `after` hook here
+  teardown(function() {
+  chai.request(server)
+    .get('/')
 });
+});
+
+
